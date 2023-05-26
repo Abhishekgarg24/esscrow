@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Erc20 TRANSACTION market DAPP</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <style>
+
+        body {
+            background-color: grey;
+            font-family: tahoma;
+            font-size: 33px;
+            display: flex;
+            flex-direction: row;
+        }
+        button {
+            background-color: ghostwhite;
+            font-size: 33px;
+            padding: 5px;
+            font-family: Impact;
+        }
+        input {
+            width: 25vw;
+            height: 30px;
+            font-size: 25px;
+            font-family: tahoma;
+            outline: none;
+        }
+        #readArea {
+            flex-basis: 50%;
+        }
+        #writeArea {
+            flex-basis: 50%;
+        }
+        button:hover {
+            background-color: lightsalmon;
+        }
+        p{
+            font-size: small;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="readArea">
+        <button onclick="connectMetamask()">CONNECT TO METAMASK</button>
+        <p id="userArea">Status: Not connected to Metamask</p>
+
+        <button onclick="connectContract()">CONNECT TO CONTRACT</button>
+        <p id="contractArea">Status: Not connected to Contract</p>
+
+        <button onclick="creatItem()">create an item</button> <br>
+        <input type="text" id="item_input" placeholder="Enter Address"> <br>
+        <input type="text" id="item_description_input" placeholder="Enter Address"> <br>
+        <input type="number" id="PriceInput" placeholder="Enter Amount"><br>
+        <p id="createdItem">item is going to be created by this function</p><br>
+
+        <button onclick="GetAproval()">get approval from both parties</button> <br>
+        <input type="text" id="inputID" placeholder="Enter ID"> <br>
+        <input type="text" id="InputBool" placeholder="Enter true Or false"><br>
+        <p id="approval">approval status will be given</p><br>
+    </div>
+
+    <div id="writeArea">
+        
+        <button onclick="TransferId()">TransferItem</button><br>
+        <input type="number" id="transferId" placeholder="Enter id"><br>
+        <p id="transfer">this function is for transfering ownership</p><br>
+
+        <button onclick="cancelItem()">cancel the item</button><br>
+        <input type="number" id="cancelItem" placeholder="Enter ID"><br>
+        <p id="cancel">this function is for canceling item</p>
+        <br>
+        
+        <button onclick="BuyItem()">BUY an item</button> <br>
+        <input type="text" id="itemID" placeholder="Enter id"> <br>
+        <p id="buy">this function is for buying item</p><br>
+        
+        <button onclick="GetItem()">Get Item Details</button><br>
+        <input type="number" id="GetItemDetail" placeholder="Enter ItemID"><br> 
+        <p id="itemDetail0">on clicking this you will get detail</p>
+        <p id="itemDetail1" ></p>
+        <p id="itemDetail2"></p>
+        <p id="itemDetail3"></p>
+        <p id="itemDetail4"></p>
+        <p id="itemDetail5"></p>
+        <p id="itemDetail6"></p>
+        <p id="itemDetail7"></p>
+        <p id="itemDetail8"></p><br>
+
+
+    </div>
+
+    <script>
+
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("userArea").innerHTML = `User Account: ${account}`;
+            }
+        }
+
+        const connectContract = async () => {
+                        const ABI = [
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "Id",
+                                                    "type": "uint256"
+                                                },
+                                                {
+                                                    "internalType": "bool",
+                                                    "name": "Approval",
+                                                    "type": "bool"
+                                                }
+                                            ],
+                                            "name": "approveItem",
+                                            "outputs": [
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "",
+                                                    "type": "string"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "function"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "Id",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "BuyItem",
+                                            "outputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "nftId",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "function"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "Id",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "cancelItemOrder",
+                                            "outputs": [
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "",
+                                                    "type": "string"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "function"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "Id",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "getItemdetail",
+                                            "outputs": [
+                                                {
+                                                    "components": [
+                                                        {
+                                                            "internalType": "string",
+                                                            "name": "itemName",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "internalType": "string",
+                                                            "name": "itemDescription",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "internalType": "address",
+                                                            "name": "itemOwner",
+                                                            "type": "address"
+                                                        },
+                                                        {
+                                                            "internalType": "address",
+                                                            "name": "recipient",
+                                                            "type": "address"
+                                                        },
+                                                        {
+                                                            "internalType": "uint256",
+                                                            "name": "price",
+                                                            "type": "uint256"
+                                                        },
+                                                        {
+                                                            "internalType": "bool",
+                                                            "name": "approvalByOwner",
+                                                            "type": "bool"
+                                                        },
+                                                        {
+                                                            "internalType": "bool",
+                                                            "name": "approvalBySeller",
+                                                            "type": "bool"
+                                                        },
+                                                        {
+                                                            "internalType": "uint256",
+                                                            "name": "NFTcreated",
+                                                            "type": "uint256"
+                                                        }
+                                                    ],
+                                                    "internalType": "struct NFTstaker.item",
+                                                    "name": "",
+                                                    "type": "tuple"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "function"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "Id",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "transferOwnership",
+                                            "outputs": [
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "",
+                                                    "type": "string"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "function"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "contract erc20",
+                                                    "name": "_addressERC20",
+                                                    "type": "address"
+                                                },
+                                                {
+                                                    "internalType": "contract Erc721",
+                                                    "name": "_addressERC721",
+                                                    "type": "address"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "constructor"
+                                        },
+                                        {
+                                            "anonymous": false,
+                                            "inputs": [
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "uint256",
+                                                    "name": "itemID",
+                                                    "type": "uint256"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "string",
+                                                    "name": "itemNAME",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "string",
+                                                    "name": "ItemDesc",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "address",
+                                                    "name": "ownerITEM",
+                                                    "type": "address"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "address",
+                                                    "name": "respAdress",
+                                                    "type": "address"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "uint256",
+                                                    "name": "paise",
+                                                    "type": "uint256"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "bool",
+                                                    "name": "apprOwner",
+                                                    "type": "bool"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "bool",
+                                                    "name": "respAppr",
+                                                    "type": "bool"
+                                                },
+                                                {
+                                                    "indexed": false,
+                                                    "internalType": "uint256",
+                                                    "name": "NFTid",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "ITEM",
+                                            "type": "event"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "_itemName",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "_itemDes",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "Price",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "ItemReg",
+                                            "outputs": [
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "",
+                                                    "type": "string"
+                                                }
+                                            ],
+                                            "stateMutability": "nonpayable",
+                                            "type": "function"
+                                        },
+                                        {
+                                            "inputs": [
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "name": "Item",
+                                            "outputs": [
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "itemName",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "internalType": "string",
+                                                    "name": "itemDescription",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "internalType": "address",
+                                                    "name": "itemOwner",
+                                                    "type": "address"
+                                                },
+                                                {
+                                                    "internalType": "address",
+                                                    "name": "recipient",
+                                                    "type": "address"
+                                                },
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "price",
+                                                    "type": "uint256"
+                                                },
+                                                {
+                                                    "internalType": "bool",
+                                                    "name": "approvalByOwner",
+                                                    "type": "bool"
+                                                },
+                                                {
+                                                    "internalType": "bool",
+                                                    "name": "approvalBySeller",
+                                                    "type": "bool"
+                                                },
+                                                {
+                                                    "internalType": "uint256",
+                                                    "name": "NFTcreated",
+                                                    "type": "uint256"
+                                                }
+                                            ],
+                                            "stateMutability": "view",
+                                            "type": "function"
+                                        }
+                                    ];
+
+                        const Address = "0xFAaA69b8AA80540630e3EB766b37397B9A6D2159";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract(ABI, Address);
+            document.getElementById("contractArea").innerHTML = "Connected to Contract";
+        }
+
+        const creatItem = async () => {
+            const item = document.getElementById("item_input").value;
+            const itemDes = document.getElementById("item_description_input").value;
+            const itemPrice = document.getElementById("PriceInput").value;
+            const data = await window.contract.methods.ItemReg(item,itemDes,itemPrice).send({from: account,gas:"1000000"});
+            console.log(data.events.ITEM.returnValues);
+            document.getElementById("createdItem").innerHTML =  "item Created";
+    }
+
+        const GetItem = async () => {
+            const itemID = document.getElementById("GetItemDetail").value;
+            const data = await window.contract.methods.getItemdetail(itemID).send({from: account,gas:"1000000"});
+            console.log(data.events.ITEM.returnValues);
+            document.getElementById("itemDetail0").innerHTML =  "item id  = " + JSON.stringify(data.events.ITEM.returnValues.itemID);
+            document.getElementById("itemDetail1").innerHTML =  "item name  = " +JSON.stringify(data.events.ITEM.returnValues.itemNAME);
+            document.getElementById("itemDetail2").innerHTML =  "item description = " +JSON.stringify(data.events.ITEM.returnValues.ItemDesc);
+            document.getElementById("itemDetail3").innerHTML =  "item owner  = " +JSON.stringify(data.events.ITEM.returnValues.ownerITEM);
+            document.getElementById("itemDetail4").innerHTML =  "item buyer  = " +JSON.stringify(data.events.ITEM.returnValues.respAdress);
+            document.getElementById("itemDetail5").innerHTML =  "item price  = " +JSON.stringify(data.events.ITEM.returnValues.paise);
+            document.getElementById("itemDetail6").innerHTML =  "approval by owner  = " +JSON.stringify(data.events.ITEM.returnValues.apprOwner);
+            document.getElementById("itemDetail7").innerHTML =  "approval by buyer = " +JSON.stringify(data.events.ITEM.returnValues.respAppr);
+            document.getElementById("itemDetail8").innerHTML =  "nft tokenid  = " +JSON.stringify(data.events.ITEM.returnValues.NFTid);
+        }
+
+        const GetAproval =  async () => {
+            const itemId = document.getElementById("inputID").value;
+            const permit = document.getElementById("InputBool").value;
+            const data = await window.contract.methods.approveItem(itemId, InputBool).send({from: account,gas:"1000000"});
+            document.getElementById("approval").innerHTML = "item approved by one of them check in details";
+        }
+
+
+        const TransferId = async () => {
+            const itemID = document.getElementById("transferId").value;
+            const data = await window.contract.methods.transferOwnership(itemID).send({from: account,gas:"3000000"});
+            document.getElementById("transfer").innerHTML =  "item transfered";
+        }
+
+        
+        const BuyItem = async () => {
+            const itemID = document.getElementById("itemID").value;
+            const data = await window.contract.methods.BuyItem(itemID).send({from: account,gas:"3000000"});
+            document.getElementById("buy").innerHTML =  "recipient's request for buying is successfuly reached owner";
+        }
+
+        const cancelItem = async () => {
+            const itemID = document.getElementById("cancelItem").value;
+            const data = await window.contract.methods.cancelItemOrder(itemID).send({from: account,gas:"3000000"});
+            document.getElementById("cancel").innerHTML =  "item canceled";
+        }
+
+    </script>
+   
+</body>
+</html>
