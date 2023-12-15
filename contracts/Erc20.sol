@@ -90,8 +90,6 @@ contract erc20 {
         return true;
     }
 
-    function text(string memory _name) public returns(string memory){
-        return(_name);
-    }
+   
 
 }
