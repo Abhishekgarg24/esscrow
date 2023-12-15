@@ -58,7 +58,7 @@ contract erc20 {
         return totalSupply_;
     }
 
-    function allowance(
+    function allowence(
         address _owner,
         address _spender
     ) public view returns (uint) {
@@ -89,4 +89,9 @@ contract erc20 {
         emit Transfer(_from, _to, _value);
         return true;
     }
+
+    function text(string memory _name) public returns(string memory){
+        return(_name);
+    }
+
 }
